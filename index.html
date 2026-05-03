@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Pagamentos</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+  color: #f1f5f9;
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+.container {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fbbf24, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 30px;
+  letter-spacing: -0.5px;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+.card {
+  background: rgba(30, 27, 75, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(226, 232, 240, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgba(226, 232, 240, 0.2);
+  box-shadow: 0 12px 48px rgba(251, 191, 36, 0.1);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+button {
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(226, 232, 240, 0.15);
+  background: rgba(15, 23, 42, 0.4);
+  color: #cbd5e1;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+button:hover {
+  border-color: rgba(251, 191, 36, 0.3);
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+  transform: translateY(-2px);
+}
+
+.selected {
+  background: linear-gradient(135deg, #fbbf24, #f97316);
+  color: #0f172a;
+  font-weight: 600;
+  border-color: #fbbf24;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 12px 16px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(226, 232, 240, 0.1);
+  background: rgba(15, 23, 42, 0.4);
+  color: #f1f5f9;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: rgba(251, 191, 36, 0.5);
+  background: rgba(15, 23, 42, 0.6);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.1);
+}
+
+input::placeholder, textarea::placeholder {
+  color: rgba(203, 213, 225, 0.5);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.send {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #fbbf24, #f97316);
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 8px 20px rgba(251, 191, 36, 0.3);
+}
+
+.send:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(251, 191, 36, 0.4);
+}
+
+.send:active {
+  transform: translateY(-1px);
+}
+
+.details {
+  font-family: 'Courier New', monospace;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1.5px solid rgba(251, 191, 36, 0.2);
+  padding: 14px;
+  border-radius: 10px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #fbbf24;
+  letter-spacing: 0.5px;
+  word-break: break-all;
+}
+
+.loader {
+  display: none;
+  text-align: center;
+  margin-top: 16px;
+  color: #fbbf24;
+  font-weight: 600;
+  font-size: 14px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.step-section {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 500px;
+    opacity: 1;
+  }
+}
+
+.step-section {
+  animation: slideDown 0.4s ease-in-out;
+}
+
+.copy-btn {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.copy-btn:hover {
+  background: rgba(251, 191, 36, 0.25);
+  border-color: #fbbf24;
+}
+
+.wallet-display {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1.5px solid rgba(251, 191, 36, 0.2);
+  padding: 12px;
+  border-radius: 8px;
+  margin: 12px 0;
+  font-family: 'Courier New', monospace;
+  color: #fbbf24;
+  font-size: 12px;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+input[type="file"] {
+  padding: 10px;
+}
+
+input[type="file"]::file-selector-button {
+  padding: 8px 16px;
+  background: rgba(251, 191, 36, 0.15);
+  border: 1.5px solid rgba(251, 191, 36, 0.3);
+  border-radius: 8px;
+  color: #fbbf24;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: rgba(251, 191, 36, 0.25);
+  border-color: #fbbf24;
+}
+
+.warning-box {
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid rgba(239, 68, 68, 0.4);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  color: #fecaca;
+  font-size: 13px;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.warning-box strong {
+  color: #fca5a5;
+}
+
+.amount-display {
+  background: rgba(251, 191, 36, 0.08);
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  color: #fbbf24;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+}
+
+.amount-display .label {
+  font-size: 12px;
+  color: #cbd5e1;
+  display: block;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 24px;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>💳 Pagamentos</h1>
+
+<!-- VALOR PRIMEIRO -->
+<div class="card">
+<h3>Informe o Valor</h3>
+
+<input id="amount" type="number" autocomplete="transaction-amount" placeholder="Valor a depositar" step="0.01" oninput="formatAmount()" required>
+
+<!-- EXIBIÇÃO DO VALOR COM MILÉSIMOS -->
+<div class="amount-display">
+  <span class="label">Valor com ID único:</span>
+  <span id="amount-formatted">0,00</span>
+</div>
+</div>
+
+<div class="card">
+<h3>Selecione o Método</h3>
+<div class="grid" id="methods"></div>
+</div>
+
+<!-- SEÇÃO DE REDES (só para criptomoedas) -->
+<div class="card step-section hidden" id="networks-section">
+<h3>Selecione a Rede</h3>
+<div class="grid" id="networks"></div>
+</div>
+
+<!-- SEÇÃO DE BANCOS (só para IBAN) -->
+<div class="card step-section hidden" id="banks-section">
+<h3>Selecione o Banco</h3>
+<div class="grid" id="banks"></div>
+</div>
+
+<!-- SEÇÃO DE DETALHES -->
+<div class="card step-section hidden" id="details-section">
+<h3 id="details-title">Detalhes do Método</h3>
+<div id="details-content"></div>
+</div>
+
+<div class="card">
+<h3>Seus Dados</h3>
+
+<!-- AVISO DE SEGURANÇA -->
+<div class="warning-box">
+  <strong>⚠️ AVISO IMPORTANTE:</strong> Utilize apenas o método de pagamento selecionado. Evite enviar fundos por métodos diferentes, pois isso pode causar perda ou atraso na identificação do pagamento.
+</div>
+
+<input id="name" type="text" autocomplete="name" placeholder="Nome completo" required>
+<input id="email" type="email" autocomplete="email" placeholder="Email" required>
+<textarea id="msg" placeholder="Mensagem adicional (opcional)"></textarea>
+<input id="file" type="file" accept="image/*" required>
+
+<button class="send" onclick="sendEmail()">💰 Enviar Comprovante</button>
+
+<div class="loader" id="loader">⏳ Enviando...</div>
+
+</div>
+
+</div>
+
+<script>
+emailjs.init({
+  publicKey: "7Kf1togYs_MepnGuW"
+});
+
+let selectedMethod = "";
+let selectedNetwork = "";
+let selectedBank = "";
+
+// ESTRUTURA DE DADOS ORGANIZADA
+const paymentData = {
+  usdt: {
+    name: "USDT",
+    type: "cripto",
+    networks: {
+      TRC20: "TUXXXXXXXXXXXXXXXX",
+      ERC20: "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      BEP20: "0xYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
+    }
+  },
+  trx: {
+    name: "TRX (Tron)",
+    type: "cripto",
+    networks: {
+      TRC20: "TUXXXXXXXXXXXXXXXX",
+      ERC20: "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+  },
+  btc: {
+    name: "Bitcoin",
+    type: "cripto",
+    networks: {
+      "Bitcoin": "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"
+    }
+  },
+  eth: {
+    name: "Ethereum",
+    type: "cripto",
+    networks: {
+      ERC20: "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      BEP20: "0xYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
+    }
+  },
+  binance: {
+    name: "Binance Pay",
+    type: "direct",
+    value: "ID: 123456789"
+  },
+  airtm: {
+    name: "AIRTM",
+    type: "email",
+    value: "airtm@email.com"
+  },
+  volet: {
+    name: "Volet",
+    type: "email",
+    value: "volet@email.com"
+  },
+  multicaixa: {
+    name: "Multicaixa Express",
+    type: "number",
+    value: "942515887"
+  },
+  iban: {
+    name: "IBAN",
+    type: "iban",
+    banks: {
+      atlantico: {
+        name: "Banco Atlântico",
+        iban: "AO06 0001 0000 0000 0000 0000 0"
+      },
+      bfa: {
+        name: "BFA - Banco de Fomento Angola",
+        iban: "AO06 0005 0000 0000 0000 0000 0"
+      },
+      bai: {
+        name: "BAI - Banco de Investimento Angolano",
+        iban: "AO06 0003 0000 0000 0000 0000 0"
+      }
+    }
+  }
+};
+
+// RENDERIZAR MÉTODOS PRINCIPAIS
+function renderMethods() {
+  const box = document.getElementById("methods");
+  box.innerHTML = "";
+  
+  Object.keys(paymentData).forEach(method => {
+    const data = paymentData[method];
+    const btn = document.createElement("button");
+    btn.innerText = data.name.toUpperCase();
+    btn.onclick = () => selectMethod(method);
+    box.appendChild(btn);
+  });
+}
+
+// SELECIONAR MÉTODO
+function selectMethod(method) {
+  selectedMethod = method;
+  selectedNetwork = "";
+  selectedBank = "";
+  
+  const data = paymentData[method];
+  
+  // Destacar botão selecionado
+  document.querySelectorAll("#methods button").forEach(b => b.classList.remove("selected"));
+  event.target.classList.add("selected");
+  
+  // Esconder todas as seções dinâmicas
+  document.getElementById("networks-section").classList.add("hidden");
+  document.getElementById("banks-section").classList.add("hidden");
+  document.getElementById("details-section").classList.add("hidden");
+  
+  // Se é criptomoeda: mostrar redes
+  if (data.type === "cripto") {
+    renderNetworks(method);
+    document.getElementById("networks-section").classList.remove("hidden");
+  }
+  
+  // Se é IBAN: mostrar bancos
+  else if (data.type === "iban") {
+    renderBanks(method);
+    document.getElementById("banks-section").classList.remove("hidden");
+  }
+  
+  // Outros: mostrar direto
+  else {
+    showDetails(method);
+    document.getElementById("details-section").classList.remove("hidden");
+  }
+}
+
+// RENDERIZAR REDES
+function renderNetworks(method) {
+  const data = paymentData[method];
+  const box = document.getElementById("networks");
+  box.innerHTML = "";
+  
+  Object.keys(data.networks).forEach(network => {
+    const btn = document.createElement("button");
+    btn.innerText = network;
+    btn.onclick = () => selectNetwork(method, network);
+    box.appendChild(btn);
+  });
+}
+
+// SELECIONAR REDE
+function selectNetwork(method, network) {
+  selectedNetwork = network;
+  selectedBank = "";
+  
+  // Destacar botão
+  document.querySelectorAll("#networks button").forEach(b => b.classList.remove("selected"));
+  event.target.classList.add("selected");
+  
+  // Mostrar carteira
+  showDetails(method, network);
+  document.getElementById("details-section").classList.remove("hidden");
+}
+
+// RENDERIZAR BANCOS
+function renderBanks(method) {
+  const data = paymentData[method];
+  const box = document.getElementById("banks");
+  box.innerHTML = "";
+  
+  Object.keys(data.banks).forEach(key => {
+    const btn = document.createElement("button");
+    btn.innerText = data.banks[key].name;
+    btn.onclick = () => selectBank(method, key);
+    box.appendChild(btn);
+  });
+}
+
+// SELECIONAR BANCO
+function selectBank(method, key) {
+  selectedBank = key;
+  
+  // Destacar botão
+  document.querySelectorAll("#banks button").forEach(b => b.classList.remove("selected"));
+  event.target.classList.add("selected");
+  
+  // Mostrar detalhes
+  showDetails(method, null, key);
+  document.getElementById("details-section").classList.remove("hidden");
+}
+
+// MOSTRAR DETALHES
+function showDetails(method, network = null, bank = null) {
+  const data = paymentData[method];
+  const content = document.getElementById("details-content");
+  const title = document.getElementById("details-title");
+  
+  title.innerText = data.name;
+  
+  if (data.type === "cripto" && network) {
+    const wallet = data.networks[network];
+    content.innerHTML = `
+      <div class="wallet-display">${wallet}</div>
+      <button class="copy-btn" onclick="copyToClipboard('${wallet}')">📋 Copiar Carteira</button>
+    `;
+  } 
+  else if (data.type === "iban" && bank) {
+    const bankData = data.banks[bank];
+    content.innerHTML = `
+      <p style="color: #cbd5e1; font-size: 14px; margin: 10px 0;">IBAN do ${bankData.name}</p>
+      <div class="wallet-display">${bankData.iban}</div>
+      <button class="copy-btn" onclick="copyToClipboard('${bankData.iban}')">📋 Copiar IBAN</button>
+    `;
+  }
+  else if (data.type === "direct") {
+    content.innerHTML = `
+      <div class="wallet-display">${data.value}</div>
+      <button class="copy-btn" onclick="copyToClipboard('${data.value}')">📋 Copiar</button>
+    `;
+  }
+  else if (data.type === "email") {
+    content.innerHTML = `
+      <div class="wallet-display">${data.value}</div>
+      <button class="copy-btn" onclick="copyToClipboard('${data.value}')">📋 Copiar Email</button>
+    `;
+  }
+  else if (data.type === "number") {
+    content.innerHTML = `
+      <div class="wallet-display">${data.value}</div>
+      <button class="copy-btn" onclick="copyToClipboard('${data.value}')">📋 Copiar Número</button>
+    `;
+  }
+}
+
+// COPIAR PARA CLIPBOARD
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    alert("✅ Copiado para a área de transferência!");
+  }).catch(() => {
+    alert("❌ Erro ao copiar");
+  });
+}
+
+// FORMATAR VALOR COM MILÉSIMOS
+function formatAmount() {
+  const input = document.getElementById("amount");
+  let value = input.value.trim();
+  
+  if (!value) {
+    document.getElementById("amount-formatted").innerText = "0,00";
+    return;
+  }
+  
+  // Remover espaços
+  value = value.replace(/\s/g, '');
+  
+  // Converter para número
+  let numValue = parseFloat(value);
+  
+  if (isNaN(numValue) || numValue < 0) {
+    document.getElementById("amount-formatted").innerText = "0,00";
+    return;
+  }
+  
+  // Gerar milésimos aleatórios (3 dígitos: 0-999)
+  const milliseconds = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+  
+  // Formatar: valor.milésimos
+  // Exemplo: 27.828
+  const formatted = numValue + '.' + milliseconds;
+  
+  // Converter para string e substituir . por ,
+  const displayValue = formatted.replace('.', ',');
+  
+  // Armazenar o valor completo com milésimos
+  input.dataset.formattedValue = formatted;
+  
+  // Exibir
+  document.getElementById("amount-formatted").innerText = displayValue;
+}
+
+// UPLOAD IMAGEM
+async function uploadImage(file){
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const res = await fetch("https://api.imgbb.com/1/upload?key=0df1b15bfc20421c269deb216af4713b", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+  return data.data.url;
+}
+
+// ENVIAR EMAIL
+async function sendEmail(){
+  let name = document.getElementById("name").value.trim();
+  let email = document.getElementById("email").value.trim();
+  let amount = document.getElementById("amount");
+  let amountValue = amount.dataset.formattedValue || amount.value; // Usar valor com milésimos
+  let msg = document.getElementById("msg").value.trim();
+  let file = document.getElementById("file").files[0];
+
+  if (!selectedMethod) {
+    alert("⚠️ Escolha um método de pagamento");
+    return;
+  }
+  if (!name || !email || !amountValue) {
+    alert("⚠️ Preencha todos os dados obrigatórios");
+    return;
+  }
+  if (!file) {
+    alert("⚠️ Envie o comprovante em imagem");
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    alert("⚠️ Envie apenas imagens (JPG, PNG, GIF)");
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("⚠️ Arquivo muito grande (máximo 5MB)");
+    return;
+  }
+
+  document.getElementById("loader").style.display = "block";
+
+  try {
+    let imageUrl = await uploadImage(file);
+    
+    let methodName = paymentData[selectedMethod].name;
+
+    // Converter valor com ponto para vírgula para envio
+    let amountFormatted = amountValue.replace('.', ',');
+
+    await emailjs.send("service_c6pxohd", "template_cc591m9", {
+      name,
+      email,
+      method: methodName,
+      amount: amountFormatted,
+      message: msg,
+      time: new Date().toLocaleString(),
+      file: imageUrl
+    });
+
+    alert("✅ Pagamento registrado com sucesso!");
+    document.getElementById("name").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("amount").value = "";
+    document.getElementById("msg").value = "";
+    document.getElementById("file").value = "";
+    document.getElementById("amount-formatted").innerText = "0,00";
+    
+    // Resetar seleções
+    selectedMethod = "";
+    selectedNetwork = "";
+    selectedBank = "";
+    document.querySelectorAll("#methods button").forEach(b => b.classList.remove("selected"));
+    document.getElementById("networks-section").classList.add("hidden");
+    document.getElementById("banks-section").classList.add("hidden");
+    document.getElementById("details-section").classList.add("hidden");
+
+  } catch (err) {
+    console.log(err);
+    alert("❌ Erro ao enviar. Tente novamente (ver F12)");
+  }
+
+  document.getElementById("loader").style.display = "none";
+}
+
+// INICIALIZAR
+renderMethods();
+</script>
+
+</body>
+</html>
