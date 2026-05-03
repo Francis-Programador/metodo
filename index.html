@@ -3,365 +3,655 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finance Flow | Depósito Profissional</title>
+    <title>Exchange Pro | Sistema de Pagamentos</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
     <style>
         :root {
-            --bg: #0b0e11; --card: #1e2329; --border: #2f3336;
-            --primary: #fcd535; --text: #eaecef; --muted: #848e9c;
-            --success: #0ecb81; --danger: #f6465d;
+            --bg: #0b0e11;
+            --card: #1e2329;
+            --border: #2f3336;
+            --primary: #fcd535;
+            --text: #eaecef;
+            --muted: #848e9c;
+            --success: #0ecb81;
+            --danger: #f6465d;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 15px; }
         .container { max-width: 480px; margin: 0 auto; }
 
-        header { margin-bottom: 20px; border-left: 4px solid var(--primary); padding-left: 15px; }
-        h1 { font-size: 20px; font-weight: 700; }
+        header { margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        h1 { font-size: 22px; color: var(--primary); font-weight: 700; }
         .subtitle { font-size: 12px; color: var(--muted); }
 
         .card { 
-            background: var(--card); border-radius: 12px; padding: 16px; 
-            margin-bottom: 12px; border: 1px solid var(--border);
+            background: var(--card); 
+            border-radius: 12px; 
+            padding: 16px; 
+            margin-bottom: 12px; 
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        h3 { font-size: 11px; margin-bottom: 12px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+        h3 { font-size: 13px; margin-bottom: 12px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
 
         input {
-            width: 100%; padding: 14px; background: #2b3139; border: 1px solid transparent;
-            border-radius: 8px; color: #fff; font-size: 15px; margin-top: 5px;
+            width: 100%; padding: 12px; background: #2b3139; border: 1px solid transparent;
+            border-radius: 8px; color: #fff; font-size: 14px; margin-top: 8px;
         }
         input:focus { outline: none; border-color: var(--primary); }
 
-        /* Grids Dinâmicos */
-        .grid-methods { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .btn-opt {
-            padding: 12px 10px; background: #2b3139; border: 1px solid var(--border);
+            padding: 12px 8px; background: #2b3139; border: 1px solid transparent;
             border-radius: 8px; color: var(--text); cursor: pointer; font-size: 12px;
-            transition: 0.2s; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: 0.2s; font-weight: 500; text-align: center;
         }
-        .btn-opt:hover { border-color: var(--muted); }
         .btn-opt.active { border-color: var(--primary); color: var(--primary); background: rgba(252, 213, 53, 0.1); }
 
-        /* Preview de Valor */
         .preview-box {
             background: rgba(252, 213, 53, 0.05); border: 1px dashed var(--primary);
-            padding: 15px; border-radius: 10px; text-align: center; margin-top: 10px;
+            padding: 15px; border-radius: 8px; text-align: center; margin-top: 10px;
         }
         .preview-box span { font-family: monospace; font-size: 24px; font-weight: 700; color: var(--primary); }
 
-        /* Área de Dados Finais */
-        .data-card {
-            background: #0b0e11; padding: 15px; border-radius: 10px; margin-top: 15px;
-            border: 1px solid var(--border); animation: slideUp 0.3s ease;
+        .data-display {
+            background: #0b0e11; padding: 15px; border-radius: 8px; margin-top: 8px;
+            font-family: monospace; font-size: 13px; word-break: break-all; border: 1px solid var(--border);
+            color: var(--primary); text-align: center;
         }
-        .label-small { font-size: 10px; color: var(--muted); margin-bottom: 5px; display: block; }
-        .data-val { font-family: monospace; font-size: 14px; color: #fff; word-break: break-all; margin-bottom: 10px; display: block; }
-        
+
         .copy-btn {
-            width: 100%; padding: 10px; background: transparent; border: 1px solid var(--primary);
-            color: var(--primary); border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700;
+            width: 100%; margin-top: 8px; padding: 10px; background: transparent; 
+            border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600;
         }
 
-        /* Botão de Envio */
         .main-btn {
-            width: 100%; padding: 18px; background: var(--primary); color: #000;
-            border: none; border-radius: 12px; font-weight: 800; cursor: pointer;
-            margin-top: 15px; font-size: 15px; transition: 0.3s;
+            width: 100%; padding: 16px; background: var(--primary); color: #000;
+            border: none; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 15px;
+            font-size: 14px; transition: 0.3s;
         }
-        .main-btn:disabled { background: #2b3139; color: var(--muted); cursor: not-allowed; border: 1px solid var(--border); }
+        .main-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* Orders */
+        /* Estilos de Status */
         .order-item { background: #2b3139; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--muted); }
-        .status-tag { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
+        .status-tag { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
+        
         .status-pendente { background: rgba(252, 213, 53, 0.2); color: var(--primary); }
         .status-concluido { background: rgba(14, 203, 129, 0.2); color: var(--success); }
+        .status-rejeitado { background: rgba(246, 70, 93, 0.2); color: var(--danger); }
 
         .hidden { display: none; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .loading-overlay { 
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
-        }
+        .loader-text { text-align: center; font-size: 12px; margin-top: 10px; color: var(--primary); font-weight: 500; }
     </style>
 </head>
 <body>
 
-<div id="loader_screen" class="loading-overlay hidden">
-    <div style="width: 40px; height: 40px; border: 4px solid var(--primary); border-top-color: transparent; border-radius: 50%; animate: spin 1s linear infinite;"></div>
-    <p id="loader_text" style="margin-top: 15px; color: var(--primary); font-weight: 600;">Processando...</p>
-</div>
-
 <div class="container">
     <header>
-        <h1>Portal de Pagamentos</h1>
-        <p class="subtitle">Depósito Seguro • Angola & Crypto</p>
+        <h1>Pagamentos Premium</h1>
+        <p class="subtitle">Sistema de Depósito Automatizado</p>
     </header>
 
     <div class="card">
-        <h3>1. Valor do Depósito</h3>
-        <input id="u_amount" type="text" inputmode="decimal" placeholder="0.00" oninput="handleValue()">
+        <h3>1. Informe o Valor</h3>
+        <input id="amt_input" type="text" inputmode="decimal" placeholder="0.00">
         <div class="preview-box">
+            <small style="display:block; font-size:10px; color:var(--muted); margin-bottom:5px">VALOR TOTAL A ENVIAR (INCLUI ID)</small>
             <span id="final_amt">0.00</span>
         </div>
     </div>
 
     <div class="card">
-        <h3>2. Método de Pagamento</h3>
-        <div class="grid-methods" id="main_grid">
+        <h3>2. Selecione o Método</h3>
+        <div class="grid" id="main_methods"></div>
+        <div id="workflow_status" class="preview-box hidden" style="margin-top:12px; text-align:left; font-size:12px; color:var(--text);">
+            <div><strong>Fluxo ativo:</strong></div>
+            <div id="status_method">Método: —</div>
+            <div id="status_sub">Opção: —</div>
+            <div id="status_amount">Valor final: R$ 0,00</div>
+        </div>
+
+        <div id="sub_section" class="hidden fade">
+            <h3 style="margin-top:15px">Escolha a Opção/Rede</h3>
+            <div class="grid" id="sub_grid"></div>
+        </div>
+
+        <div id="data_section" class="hidden fade">
+            <div class="data-display" id="data_val"></div>
+            <button class="copy-btn" onclick="copyPaymentData()">Copiar Dados de Pagamento</button>
+            <div id="copy_feedback" class="loader-text hidden" style="margin-top:6px">Copiado com sucesso!</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>3. Enviar Comprovante</h3>
+        <input id="u_name" placeholder="Seu Nome Completo">
+        <input id="u_email" placeholder="Seu E-mail principal">
+        <input id="u_file" type="file" accept="image/*" style="border:none; padding:10px 0; color:var(--muted)">
+        <div id="review_section" class="preview-box hidden" style="margin-top:12px; text-align:left; font-size:12px;">
+            <div><strong>Revisão antes do envio</strong></div>
+            <div id="review_summary">Selecione método, sub-opção e informe o valor válido.</div>
+        </div>
+        <button class="main-btn" id="send_btn" onclick="submitOrder()" disabled>CONFIRMAR DEPÓSITO</button>
+        <p id="loader" class="loader-text hidden">🚀 Processando envio duplo (upload + e-mail + planilha)...</p>
+    </div>
+
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+            <h3>📊 Minhas Ordens</h3>
+            <div style="display:flex; gap:10px;">
+                <button onclick="refreshStatus()" style="background:none; border:none; color:var(--primary); font-size:11px; cursor:pointer; font-weight:600">ATUALIZAR STATUS</button>
+                <button onclick="clearStatus()" style="background:none; border:none; color:var(--primary); font-size:11px; cursor:pointer; font-weight:600">LIMPAR STATUS</button>
             </div>
-
-        <div id="sub_section" class="hidden fade" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
-            <h3 id="sub_title">Selecione uma opção</h3>
-            <div class="grid-methods" id="sub_grid"></div>
         </div>
-
-        <div id="final_data" class="hidden fade data-card">
-            <span id="final_label" class="label-small">DADOS DE DESTINO</span>
-            <span id="final_value" class="data-val">---</span>
-            <button class="copy-btn" onclick="copyData()">Copiar Dados</button>
+        <div id="orders_list">
+            <p style="font-size:11px; color:var(--muted); text-align:center">Nenhuma atividade detectada.</p>
         </div>
-    </div>
-
-    <div class="card">
-        <h3>3. Identificação e Comprovante</h3>
-        <input id="u_name" placeholder="Nome Completo">
-        <input id="u_email" placeholder="E-mail de Cadastro">
-        <div style="margin-top: 10px;">
-            <label class="label-small">FOTO DO COMPROVANTE (PNG/JPG)</label>
-            <input id="u_file" type="file" accept="image/*" style="border:none; padding: 0; background:none;">
-        </div>
-        <button id="submit_btn" class="main-btn" disabled onclick="processAll()">FINALIZAR DEPÓSITO</button>
-    </div>
-
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
-            <h3>Minhas Ordens</h3>
-            <button onclick="refreshHistory()" style="background:none; border:none; color:var(--primary); font-size:10px; font-weight:700; cursor:pointer">ATUALIZAR</button>
-        </div>
-        <div id="history_list"></div>
     </div>
 </div>
 
 <script>
     // --- CONFIGURAÇÃO ---
     emailjs.init("7Kf1togYs_MepnGuW");
+
     const CONFIG = {
         scriptURL: "https://script.google.com/macros/s/AKfycbwLd5_ju--UGjgvS1Je4hRDL2MJhC3fB-uMjk7oBzhKdUSTG822rCx10MDLtBYl_1o33Q/exec",
         imgbbKey: "0df1b15bfc20421c269deb216af4713b"
     };
 
-    // --- ESTRUTURA DE DADOS ---
-    const METHODS = {
-        usdt: { name: "USDT", type: "crypto", nets: { "TRC20": "TxxxxxxTRC20", "BEP20": "0xxxxxxBEP20" } },
-        btc: { name: "Bitcoin", type: "direct", val: "bc1qxxxxxxBTC" },
-        iban: { 
-            name: "Transferência", type: "bank", 
-            banks: { 
-                "BAI": "AO06.0040.0000.XXXX", 
-                "BFA": "AO06.0006.0000.XXXX", 
-                "ATLANTICO": "AO06.0001.0000.XXXX",
-                "BIC": "AO06.0051.0000.XXXX"
-            } 
+    const dataMap = {
+        usdt: {
+            name: "USDT",
+            type: "net",
+            options: {
+                "TRC-20": "TMHvF7CoQYzLkmUd9dytY3XQgJeEQNZPy4",
+                "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622",
+                "ERC-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622"
+            }
         },
-        mcx: { name: "Express", type: "direct", val: "942515887 (Referência)" },
-        money: { name: "Unitel Money", type: "direct", val: "923xxxxxx" }
-    };
-
-    let state = {
-        val: "0.00",
-        suffix: "",
-        method: null,
-        subOption: null,
-        data: null
-    };
-
-    // --- LÓGICA DE INTERFACE ---
-    function handleValue() {
-        let v = document.getElementById("u_amount").value.replace(',','.').replace(/[^0-9.]/g,'');
-        if(!state.suffix) state.suffix = Math.floor(Math.random() * 899) + 100;
-        state.val = v ? parseFloat(v).toLocaleString('pt-PT') + "," + state.suffix : "0.00";
-        document.getElementById("final_amt").innerText = state.val;
-        validateForm();
-    }
-
-    function initMethods() {
-        const grid = document.getElementById("main_grid");
-        Object.keys(METHODS).forEach(key => {
-            let btn = document.createElement("button");
-            btn.className = "btn-opt";
-            btn.innerText = METHODS[key].name;
-            btn.onclick = () => selectMethod(key, btn);
-            grid.appendChild(btn);
-        });
-        refreshHistory();
-    }
-
-    function selectMethod(key, btn) {
-        // Reset Progressivo
-        state.method = key;
-        state.subOption = null;
-        state.data = null;
-        
-        document.querySelectorAll("#main_grid .btn-opt").forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        document.getElementById("sub_section").classList.add("hidden");
-        document.getElementById("final_data").classList.add("hidden");
-
-        const m = METHODS[key];
-        if(m.type === "crypto") {
-            showSub("Selecione a Rede", m.nets);
-        } else if(m.type === "bank") {
-            showSub("Selecione o Banco", m.banks);
-        } else {
-            showFinalData(m.name, m.val);
+        trx: {
+            name: "TRX",
+            type: "net",
+            options: {
+                "TRC-20": "TMHvF7CoQYzLkmUd9dytY3XQgJeEQNZPy4",
+                "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622"
+            }
+        },
+        btc: {
+            name: "Bitcoin",
+            type: "net",
+            options: {
+                "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622",
+                "BTC": "1GUAUB9S5dwHGezh7ZJ2wLcgsXhvkaxbWW"
+            }
+        },
+        eth: {
+            name: "Ethereum",
+            type: "net",
+            options: {
+                "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622",
+                "ERC-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622"
+            }
+        },
+        binance: {
+            name: "Binance Pay",
+            type: "direct",
+            info: ["Username", "3sertrader"]
+        },
+        bank: {
+            name: "Transferência Bancária (Angola)",
+            type: "net",
+            options: {
+                BAI: "004000002238840310116",
+                BFA: "000600008100945530148",
+                ATLANTICO: "005500002286727210182"
+            }
+        },
+        express: {
+            name: "Multicaixa Express",
+            type: "direct",
+            info: ["Número", "942515887", "Referência", "{{id}}"]
+        },
+        unitel: {
+            name: "Unitel Money",
+            type: "direct",
+            info: ["Número", "942515887", "Referência", "{{id}}", "IBAN", "04170000009425158874"]
+        },
+        afrimoney: {
+            name: "Afrimoney",
+            type: "direct",
+            info: ["Número", "956803336"]
+        },
+        airtm: {
+            name: "Airtm",
+            type: "direct",
+            info: ["E-mail", "francisconongavaxavier@gmail.com"]
+        },
+        volet: {
+            name: "Volet",
+            type: "direct",
+            info: ["E-mail", "xavierfranciscoxavier432@gmail.com"]
         }
-        validateForm();
+    };
+
+    const STORAGE_KEYS = {
+        lastChoice: "payment_last_choice",
+        userEmail: "payment_user_email",
+        orderHistory: "payment_order_history"
+    };
+
+    const state = {
+        method: "",
+        sub: "",
+        amount: 0,
+        orderId: "",
+        paymentData: "",
+        lastSend: 0
+    };
+
+    function formatCurrency(value) {
+        return value.toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    function showSub(title, options) {
-        const subGrid = document.getElementById("sub_grid");
-        subGrid.innerHTML = "";
-        document.getElementById("sub_title").innerText = title;
+    function normalizeIban(value) {
+        return value
+            .toUpperCase()
+            .replace(/[^A-Z0-9]/g, "")
+            .replace(/(.{4})/g, "$1 ")
+            .trim();
+    }
+
+    function createOrderId() {
+        return "ORD" + Date.now().toString().slice(-8) + Math.floor(Math.random() * 900 + 100);
+    }
+
+    function updateAmountState() {
+        const raw = document.getElementById("amt_input").value.replace(",", ".").replace(/[^0-9.]/g, "");
+        const value = parseFloat(raw);
+
+        if (value > 0) {
+            if (!state.orderId || state.amount !== value) {
+                state.orderId = createOrderId();
+            }
+            state.amount = value;
+            document.getElementById("final_amt").innerText = `R$ ${formatCurrency(value)} • ID ${state.orderId}`;
+        } else {
+            state.amount = 0;
+            document.getElementById("final_amt").innerText = "R$ 0,00";
+        }
+
+        updateStatus();
+        validateSubmit();
+    }
+
+    function init() {
+        const mainMethodsEl = document.getElementById("main_methods");
+        mainMethodsEl.innerHTML = "";
+
+        Object.entries(dataMap).forEach(([key, item]) => {
+            const button = document.createElement("button");
+            button.className = "btn-opt";
+            button.innerText = item.name;
+            button.onclick = () => selectMain(key, button);
+            mainMethodsEl.appendChild(button);
+        });
+
+        document.getElementById("amt_input").addEventListener("input", updateAmountState);
+        document.getElementById("u_name").addEventListener("input", () => { updateReview(); validateSubmit(); });
+        document.getElementById("u_email").addEventListener("input", () => { updateReview(); validateSubmit(); });
+        document.getElementById("u_file").addEventListener("change", validateSubmit);
+
+        loadUserCache();
+        refreshStatus();
+    }
+
+    function loadUserCache() {
+        const lastChoice = localStorage.getItem(STORAGE_KEYS.lastChoice);
+        if (!lastChoice) return;
+
+        try {
+            const cached = JSON.parse(lastChoice);
+            if (cached?.method && dataMap[cached.method]) {
+                const button = Array.from(document.querySelectorAll("#main_methods .btn-opt")).find(el => el.innerText === dataMap[cached.method].name);
+                if (button) {
+                    selectMain(cached.method, button);
+                    if (cached?.sub) {
+                        const subButton = Array.from(document.querySelectorAll("#sub_grid .btn-opt")).find(el => el.innerText === cached.sub);
+                        if (subButton) subButton.click();
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn("Falha ao ler cache de seleção", error);
+        }
+    }
+
+    function saveUserCache() {
+        localStorage.setItem(STORAGE_KEYS.lastChoice, JSON.stringify({ method: state.method, sub: state.sub }));
+    }
+
+    function resetStep() {
+        document.getElementById("sub_section").classList.add("hidden");
+        document.getElementById("sub_grid").innerHTML = "";
+        document.getElementById("data_section").classList.add("hidden");
+        document.getElementById("review_section").classList.add("hidden");
+        document.getElementById("data_val").innerText = "";
+        state.sub = "";
+        state.paymentData = "";
+        updateStatus(true);
+        saveUserCache();
+    }
+
+    function selectMain(key, button) {
+        state.method = key;
+        state.sub = "";
+        state.paymentData = "";
+
+        document.querySelectorAll("#main_methods .btn-opt").forEach(el => el.classList.remove("active"));
+        button.classList.add("active");
+
+        const item = dataMap[key];
+        document.getElementById("workflow_status").classList.remove("hidden");
+        document.getElementById("status_method").innerText = `Método: ${item.name}`;
+        document.getElementById("status_sub").innerText = item.type === "net" ? "Opção: —" : "Opção: não aplicável";
+
+        resetStep();
+
+        if (item.type === "net") {
+            renderSub(item.options);
+        } else {
+            showData(buildPaymentData(item));
+        }
+
+        updateStatus();
+        validateSubmit();
+        saveUserCache();
+    }
+
+    function renderSub(options) {
+        const grid = document.getElementById("sub_grid");
+        grid.innerHTML = "";
         document.getElementById("sub_section").classList.remove("hidden");
 
-        Object.keys(options).forEach(opt => {
-            let btn = document.createElement("button");
-            btn.className = "btn-opt";
-            btn.innerText = opt;
-            btn.onclick = () => {
-                document.querySelectorAll("#sub_grid .btn-opt").forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                state.subOption = opt;
-                showFinalData(opt, options[opt]);
+        Object.keys(options).forEach(option => {
+            const button = document.createElement("button");
+            button.className = "btn-opt";
+            button.innerText = option;
+            button.onclick = () => {
+                document.querySelectorAll("#sub_grid .btn-opt").forEach(el => el.classList.remove("active"));
+                button.classList.add("active");
+                state.sub = option;
+                showData(buildPaymentData(dataMap[state.method], option));
             };
-            subGrid.appendChild(btn);
+            grid.appendChild(button);
         });
     }
 
-    function showFinalData(label, val) {
-        state.data = val;
-        document.getElementById("final_data").classList.remove("hidden");
-        document.getElementById("final_label").innerText = "DESTINO: " + label;
-        document.getElementById("final_value").innerText = val;
-        validateForm();
-    }
-
-    function copyData() {
-        navigator.clipboard.writeText(state.data);
-        alert("Copiado com sucesso!");
-    }
-
-    function validateForm() {
-        const name = document.getElementById("u_name").value;
-        const email = document.getElementById("u_email").value;
-        const file = document.getElementById("u_file").files.length;
-        const btn = document.getElementById("submit_btn");
-
-        // Regra de Ouro: Valor + Método + (Subopção se houver) + Dados Pessoais
-        const hasSub = (METHODS[state.method]?.type === "crypto" || METHODS[state.method]?.type === "bank");
-        const subValid = hasSub ? !!state.subOption : true;
-
-        if(state.val !== "0.00" && state.method && subValid && name && email && file) {
-            btn.disabled = false;
-        } else {
-            btn.disabled = true;
+    function buildPaymentData(item, selectedOption = "") {
+        if (item.type === "net") {
+            const rawValue = item.options[selectedOption] || "";
+            const value = item.name.includes("Transferência") ? normalizeIban(rawValue) : rawValue;
+            return `${item.name} • ${selectedOption}\n${item.name.includes("Transferência") ? `IBAN: ${value}` : value}`;
         }
-    }
 
-    // Ouvintes de input para validação em tempo real
-    document.getElementById("u_name").oninput = validateForm;
-    document.getElementById("u_email").oninput = validateForm;
-    document.getElementById("u_file").onchange = validateForm;
-
-    // --- PROCESSAMENTO FINAL ---
-    async function processAll() {
-        const loader = document.getElementById("loader_screen");
-        const loaderTxt = document.getElementById("loader_text");
-        loader.classList.remove("hidden");
-
-        try {
-            // 1. Upload ImgBB
-            loaderTxt.innerText = "⏳ Enviando comprovante...";
-            let fd = new FormData();
-            fd.append("image", document.getElementById("u_file").files[0]);
-            let resImg = await fetch(`https://api.imgbb.com/1/upload?key=${CONFIG.imgbbKey}`, { method: "POST", body: fd });
-            let imgJson = await resImg.json();
-            const urlImg = imgJson.data.url;
-
-            // 2. Planilha Google
-            loaderTxt.innerText = "📊 Registrando ordem...";
-            const payload = {
-                id: Date.now().toString(),
-                nome: document.getElementById("u_name").value,
-                email: document.getElementById("u_email").value,
-                valor: state.val,
-                metodo: METHODS[state.method].name + (state.subOption ? " ("+state.subOption+")" : ""),
-                comprovante: urlImg
-            };
-
-            await fetch(CONFIG.scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-
-            // 3. Notificação Email
-            loaderTxt.innerText = "📧 Notificando administração...";
-            await emailjs.send("service_c6pxohd", "template_cc591m9", {
-                name: payload.nome,
-                email: payload.email,
-                amount: payload.valor,
-                method: payload.metodo,
-                img_url: urlImg
-            });
-
-            localStorage.setItem("last_user_email", payload.email);
-            alert("✅ DEPÓSITO SOLICITADO!\nAguarde a confirmação em seu histórico.");
-            location.reload();
-
-        } catch (e) {
-            alert("❌ Erro no processo. Tente novamente.");
-            loader.classList.add("hidden");
-        }
-    }
-
-    async function refreshHistory() {
-        const email = localStorage.getItem("last_user_email");
-        if(!email) return;
-        
-        const list = document.getElementById("history_list");
-        list.innerHTML = "<p style='text-align:center; font-size:10px; color:var(--muted)'>Sincronizando...</p>";
-
-        try {
-            const res = await fetch(`${CONFIG.scriptURL}?email=${email}`);
-            const data = await res.json();
-            
-            if(data.length === 0) {
-                list.innerHTML = "<p style='text-align:center; font-size:10px;'>Nenhuma ordem encontrada.</p>";
+        const lines = [];
+        item.info.forEach((itemValue, index) => {
+            if (itemValue === "{{id}}") {
+                lines.push(state.orderId || createOrderId());
+                if (!state.orderId) state.orderId = lines[lines.length - 1];
                 return;
             }
+            if (itemValue.includes("{{id}}")) {
+                lines.push(itemValue.replace("{{id}}", state.orderId || createOrderId()));
+                if (!state.orderId) state.orderId = lines[lines.length - 1];
+                return;
+            }
+            lines.push(itemValue);
+        });
+        return `${item.name}\n${lines.join("\n")}`;
+    }
 
-            list.innerHTML = data.reverse().map(o => `
-                <div class="order-item">
-                    <div style="display:flex; justify-content:space-between; align-items:center">
-                        <span style="font-weight:600; font-size:12px">${o.metodo}</span>
-                        <span class="status-tag status-${o.status.toLowerCase().replace('ú','u')}">${o.status}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-top:5px">
-                        <span style="color:var(--primary); font-weight:700">${o.valor}</span>
-                        <span>${new Date(o.data).toLocaleDateString()}</span>
-                    </div>
-                </div>
-            `).join('');
-        } catch(e) {
-            list.innerHTML = "<p style='text-align:center; font-size:10px;'>E-mail não encontrado ou erro de rede.</p>";
+    function showData(value) {
+        if (!state.orderId) state.orderId = createOrderId();
+        state.paymentData = value;
+        document.getElementById("data_val").innerText = value;
+        document.getElementById("data_section").classList.remove("hidden");
+        document.getElementById("review_section").classList.remove("hidden");
+        updateReview();
+        updateStatus();
+        validateSubmit();
+        saveUserCache();
+    }
+
+    function updateStatus(clear = false) {
+        const statusEl = document.getElementById("workflow_status");
+        if (clear) {
+            statusEl.classList.remove("hidden");
+            document.getElementById("status_amount").innerText = `Valor final: ${state.amount > 0 ? `R$ ${formatCurrency(state.amount)} • ID ${state.orderId}` : "R$ 0,00"}`;
+            return;
+        }
+        document.getElementById("status_amount").innerText = `Valor final: ${state.amount > 0 ? `R$ ${formatCurrency(state.amount)} • ID ${state.orderId}` : "R$ 0,00"}`;
+    }
+
+    function updateReview() {
+        const name = document.getElementById("u_name").value.trim() || "—";
+        const email = document.getElementById("u_email").value.trim() || "—";
+        const amount = state.amount > 0 ? `R$ ${formatCurrency(state.amount)}` : "—";
+        const method = state.method ? dataMap[state.method].name : "—";
+        const sub = state.sub || (dataMap[state.method]?.type === "net" ? "—" : "Não aplicável");
+
+        document.getElementById("review_summary").innerText = `Nome: ${name} | Email: ${email} | Valor: ${amount} | Método: ${method} | Opção: ${sub}`;
+    }
+
+    function validateSubmit() {
+        const name = document.getElementById("u_name").value.trim();
+        const email = document.getElementById("u_email").value.trim();
+        const file = document.getElementById("u_file").files[0];
+        const hasMethod = !!state.method;
+        const hasSub = dataMap[state.method]?.type === "net" ? !!state.sub : true;
+        const isValidAmount = state.amount > 0;
+        const orderReady = name && email && file && hasMethod && hasSub && isValidAmount && !!state.paymentData;
+
+        const now = Date.now();
+        const waitRemaining = state.lastSend ? Math.max(0, 10000 - (now - state.lastSend)) : 0;
+
+        const sendBtn = document.getElementById("send_btn");
+        if (waitRemaining > 0) {
+            sendBtn.disabled = true;
+            sendBtn.innerText = `Aguarde ${Math.ceil(waitRemaining / 1000)}s`;
+        } else {
+            sendBtn.disabled = !orderReady;
+            sendBtn.innerText = "CONFIRMAR DEPÓSITO";
+        }
+
+        if (orderReady) {
+            document.getElementById("review_section").classList.remove("hidden");
+        }
+        return orderReady && waitRemaining === 0;
+    }
+
+    function copyPaymentData() {
+        if (!state.paymentData) return;
+        const lines = state.paymentData.split('\n');
+        const principal = lines[lines.length - 1];
+        navigator.clipboard.writeText(principal).then(() => {
+            const feedback = document.getElementById("copy_feedback");
+            feedback.classList.remove("hidden");
+            feedback.innerText = "Copiado com sucesso";
+            setTimeout(() => feedback.classList.add("hidden"), 1500);
+        });
+    }
+
+    function getLocalOrders() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.orderHistory) || "[]");
+        } catch (error) {
+            return [];
         }
     }
 
-    initMethods();
-</script>
+    function saveLocalOrder(order) {
+        const orders = getLocalOrders();
+        orders.unshift(order);
+        localStorage.setItem(STORAGE_KEYS.orderHistory, JSON.stringify(orders.slice(0, 30)));
+    }
 
+    async function submitOrder() {
+        if (!validateSubmit()) {
+            return alert("Preencha todos os campos obrigatórios e selecione o método correto.");
+        }
+
+        const name = document.getElementById("u_name").value.trim();
+        const email = document.getElementById("u_email").value.trim();
+        const file = document.getElementById("u_file").files[0];
+        const method = dataMap[state.method].name;
+        const subOption = state.sub || (dataMap[state.method]?.type === "net" ? "—" : "Sem subopção");
+
+        if (Date.now() - state.lastSend < 10000) {
+            return alert("Aguarde 10 segundos entre os envios para evitar spam.");
+        }
+
+        state.lastSend = Date.now();
+        validateSubmit();
+        document.getElementById("send_btn").disabled = true;
+        document.getElementById("loader").classList.remove("hidden");
+
+        try {
+            const fd = new FormData();
+            fd.append("image", file);
+            const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${CONFIG.imgbbKey}`, { method: "POST", body: fd });
+            const imgJson = await resImg.json();
+            const finalImgLink = imgJson.data?.url || "";
+
+            const payload = {
+                id: state.orderId,
+                nome: name,
+                email: email,
+                valor: `R$ ${formatCurrency(state.amount)} • ID ${state.orderId}`,
+                metodo: method,
+                subOpcao: subOption,
+                destino: state.paymentData,
+                comprovante: finalImgLink,
+                timestamp: new Date().toISOString()
+            };
+
+            const sheetTask = fetch(CONFIG.scriptURL, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify(payload)
+            });
+
+            const emailTask = emailjs.send("service_c6pxohd", "template_cc591m9", {
+                name: name,
+                email: email,
+                amount: payload.valor,
+                method: method,
+                subOption: subOption,
+                destination: state.paymentData,
+                img_url: finalImgLink,
+                id: state.orderId,
+                date: new Date().toLocaleString()
+            });
+
+            await Promise.all([sheetTask, emailTask]);
+
+            localStorage.setItem(STORAGE_KEYS.userEmail, email);
+            saveLocalOrder({
+                id: state.orderId,
+                metodo: method,
+                valor: payload.valor,
+                data: new Date().toISOString(),
+                status: "Pendente",
+                email: email
+            });
+
+            alert("✅ Depósito confirmado. Seu pedido foi enviado com sucesso.");
+            refreshStatus();
+            document.getElementById("loader").classList.add("hidden");
+            document.getElementById("send_btn").disabled = true;
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao processar o envio. Verifique sua conexão e tente novamente.");
+            document.getElementById("loader").classList.add("hidden");
+            validateSubmit();
+        }
+    }
+
+    function dedupeOrders(orders) {
+        const map = new Map();
+        orders.forEach(order => {
+            const key = order.id || `${order.metodo}|${order.valor}|${order.data}`;
+            if (!map.has(key)) {
+                map.set(key, order);
+            }
+        });
+        return Array.from(map.values());
+    }
+
+    function clearStatus() {
+        localStorage.removeItem(STORAGE_KEYS.orderHistory);
+        document.getElementById("orders_list").innerHTML = "<p style='font-size:11px; color:var(--muted); text-align:center'>Status limpo com sucesso.</p>";
+    }
+
+    async function refreshStatus() {
+        const email = localStorage.getItem(STORAGE_KEYS.userEmail);
+        const list = document.getElementById("orders_list");
+        if (!email) {
+            list.innerHTML = "<p style='font-size:11px; color:var(--muted); text-align:center'>Nenhum e-mail cadastrado ainda.</p>";
+            return;
+        }
+
+        list.innerHTML = "<p style='text-align:center; font-size:11px; color:var(--primary)'>Sincronizando...</p>";
+
+        let orders = getLocalOrders().filter(order => order.email === email);
+
+        try {
+            const res = await fetch(`${CONFIG.scriptURL}?email=${encodeURIComponent(email)}`);
+            const remote = await res.json();
+            if (Array.isArray(remote)) {
+                const normalized = remote.map(item => ({
+                    id: item.id || item.ID || item.orderId || "—",
+                    metodo: item.metodo || item.method || "Desconhecido",
+                    valor: item.valor || item.amount || "—",
+                    data: item.data || item.timestamp || new Date().toISOString(),
+                    status: item.status || "Pendente"
+                }));
+                orders = normalized.concat(orders);
+            }
+        } catch (error) {
+            console.warn("Falha ao buscar status remoto", error);
+        }
+
+        orders = dedupeOrders(orders);
+
+        if (orders.length === 0) {
+            list.innerHTML = "<p style='text-align:center; font-size:11px;'>Nenhuma ordem encontrada.</p>";
+            return;
+        }
+
+        list.innerHTML = orders.slice(0, 10).map(o => `
+            <div class="order-item">
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <span style="font-weight:600; font-size:13px">${o.metodo}</span>
+                    <span class="status-tag status-${o.status.toLowerCase().replace(/ú/g, 'u').replace(/[^a-z0-9]/gi,'')}">${o.status}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:6px">
+                    <span style="color:var(--text); font-weight:500">${o.valor}</span>
+                    <span>${new Date(o.data).toLocaleDateString()}</span>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    init();
+</script>
 </body>
 </html>
