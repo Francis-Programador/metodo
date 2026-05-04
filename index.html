@@ -98,6 +98,86 @@
 
         .hidden { display: none; }
         .loader-text { text-align: center; font-size: 12px; margin-top: 10px; color: var(--primary); font-weight: 500; }
+
+        /* ============ LOADER COMBINADO: GIRANDO + BRILHO + ZOOM ============ */
+        .img-glow-zoom-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px auto;
+        }
+
+        .img-glow-zoom-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid transparent;
+            border-top-color: var(--primary);
+            border-right-color: var(--primary);
+            border-radius: 50%;
+            animation: spin-glow-zoom 1.5s linear infinite;
+        }
+
+        .img-glow-zoom {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 0 15px rgba(252, 213, 53, 0.5);
+            border: 2px solid var(--primary);
+            animation: zoom-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes spin-glow-zoom {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes zoom-glow {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(252, 213, 53, 0.5);
+            }
+            50% { 
+                transform: scale(1.15);
+                box-shadow: 0 0 25px rgba(252, 213, 53, 0.8);
+            }
+        }
+
+        /* ============ LOADER ONDAS ============ */
+        .wave {
+            width: 50px;
+            height: 40px;
+            display: flex;
+            gap: 4px;
+            align-items: flex-end;
+            justify-content: center;
+            margin: 10px auto;
+        }
+
+        .wave-bar {
+            width: 5px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 2px;
+            animation: wave-anim 1.2s ease-in-out infinite;
+        }
+
+        .wave-bar:nth-child(1) { animation-delay: 0s; }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes wave-anim {
+            0%, 100% { height: 12px; }
+            50% { height: 30px; }
+        }
     </style>
 </head>
 <body>
@@ -147,13 +227,29 @@
         </div>
         
         <button class="main-btn" id="send_btn" onclick="submitOrder()" disabled>CONFIRMAR DEPÓSITO</button>
-        <p id="loader" class="loader-text hidden">🚀 Processando envio...</p>
+        <div id="loader" class="hidden">
+            <div class="img-glow-zoom-container">
+                <div class="img-glow-zoom-ring"></div>
+                <img class="img-glow-zoom" src="Screenshot_20250210-102103-removebg-preview.png" alt="carregando">
+            </div>
+            <p class="loader-text">🚀 Processando envio...</p>
+        </div>
     </div>
 
     <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
             <h3>📊 Minhas Ordens</h3>
             <button onclick="refreshStatus()" style="background:none; border:none; color:var(--primary); font-size:11px; cursor:pointer; font-weight:600">ATUALIZAR</button>
+        </div>
+        <div id="loader_status" class="hidden" style="text-align:center; margin:15px 0">
+            <div class="wave">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+            </div>
+            <p class="loader-text">🔄 Atualizando status...</p>
         </div>
         <div id="orders_list">
             <p style="font-size:11px; color:var(--muted); text-align:center">Nenhuma atividade detectada.</p>
@@ -401,11 +497,14 @@
         const email = localStorage.getItem("payment_user_email");
         const localHistory = getOrderHistory();
         const btn = document.querySelector("[onclick='refreshStatus()']");
+        const loaderStatus = document.getElementById("loader_status");
         
         if (btn) {
             btn.disabled = true;
             btn.innerText = "🔄 ATUALIZANDO...";
         }
+        
+        loaderStatus.classList.remove("hidden");
 
         try {
             if (!email) {
@@ -438,6 +537,7 @@
                 btn.disabled = false;
                 btn.innerText = "ATUALIZAR";
             }
+            loaderStatus.classList.add("hidden");
         }
     }
 
