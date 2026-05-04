@@ -57,17 +57,28 @@
             background: rgba(252, 213, 53, 0.05); border: 1px dashed var(--primary);
             padding: 15px; border-radius: 8px; text-align: center; margin-top: 10px;
         }
-        .preview-box span { font-family: monospace; font-size: 24px; font-weight: 700; color: var(--primary); }
+        .preview-box span { font-family: monospace; font-size: 32px; font-weight: 700; color: var(--primary); display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+        .preview-box .currency-symbol { font-size: 20px; font-weight: 600; color: #fcd535; }
+        .preview-box .currency-code { font-size: 12px; font-weight: 600; color: var(--muted); margin-top: 5px; }
 
         .data-display {
             background: #0b0e11; padding: 15px; border-radius: 8px; margin-top: 8px;
             font-family: monospace; font-size: 13px; word-break: break-all; border: 1px solid var(--border);
-            color: var(--primary); text-align: center;
+            color: var(--primary); text-align: center; white-space: pre-line;
         }
 
         .copy-btn {
             width: 100%; margin-top: 8px; padding: 10px; background: transparent; 
             border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600;
+        }
+
+        .delete-btn {
+            margin-top: 10px; padding: 8px 10px; background: transparent;
+            border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px;
+            cursor: pointer; font-size: 11px; font-weight: 600;
+        }
+        .delete-btn:hover {
+            border-color: var(--danger); color: var(--danger);
         }
 
         .main-btn {
@@ -77,7 +88,6 @@
         }
         .main-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* Estilos de Status */
         .order-item { background: #2b3139; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--muted); }
         .status-tag { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
         
@@ -86,9 +96,6 @@
         .status-rejeitado { background: rgba(246, 70, 93, 0.2); color: var(--danger); }
 
         .hidden { display: none; }
-        .fade { animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         .loader-text { text-align: center; font-size: 12px; margin-top: 10px; color: var(--primary); font-weight: 500; }
     </style>
 </head>
@@ -96,35 +103,32 @@
 
 <div class="container">
     <header>
-        <h1>Pagamentos Premium</h1>
+        <h1>METÓDOS DE PAGAMENTO | 3SER TRADER SEM RÉ</h1>
         <p class="subtitle">Sistema de Depósito Automatizado</p>
     </header>
 
     <div class="card">
         <h3>1. Informe o Valor</h3>
-        <input id="amt_input" type="text" inputmode="decimal" placeholder="0.00">
+        <input id="amt_input" type="text" placeholder="Ex: 500,00 ou 500.00">
         <div class="preview-box">
-            <small style="display:block; font-size:10px; color:var(--muted); margin-bottom:5px">VALOR TOTAL A ENVIAR (INCLUI ID)</small>
-            <span id="final_amt">0.00</span>
+            <small style="display:block; font-size:10px; color:var(--muted); margin-bottom:10px">VALOR EXATO A ENVIAR (ID DE DEPÓSITO)</small>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px">
+                <span id="final_amt" style="font-size:36px; font-weight:700; color:var(--primary); font-family:monospace">0,000</span>
+                <div id="currency_info" style="font-size:11px; color:var(--muted)">Selecione um método para ver a moeda</div>
+            </div>
         </div>
     </div>
 
     <div class="card">
         <h3>2. Selecione o Método</h3>
         <div class="grid" id="main_methods"></div>
-        <div id="workflow_status" class="preview-box hidden" style="margin-top:12px; text-align:left; font-size:12px; color:var(--text);">
-            <div><strong>Fluxo ativo:</strong></div>
-            <div id="status_method">Método: —</div>
-            <div id="status_sub">Opção: —</div>
-            <div id="status_amount">Valor final: R$ 0,00</div>
-        </div>
-
-        <div id="sub_section" class="hidden fade">
-            <h3 style="margin-top:15px">Escolha a Opção/Rede</h3>
+        
+        <div id="sub_section" class="hidden">
+            <h3 style="margin-top:15px">Escolha a Opção/Rede/Banco</h3>
             <div class="grid" id="sub_grid"></div>
         </div>
 
-        <div id="data_section" class="hidden fade">
+        <div id="data_section" class="hidden">
             <div class="data-display" id="data_val"></div>
             <button class="copy-btn" onclick="copyPaymentData()">Copiar Dados de Pagamento</button>
             <div id="copy_feedback" class="loader-text hidden" style="margin-top:6px">Copiado com sucesso!</div>
@@ -136,21 +140,19 @@
         <input id="u_name" placeholder="Seu Nome Completo">
         <input id="u_email" placeholder="Seu E-mail principal">
         <input id="u_file" type="file" accept="image/*" style="border:none; padding:10px 0; color:var(--muted)">
+        
         <div id="review_section" class="preview-box hidden" style="margin-top:12px; text-align:left; font-size:12px;">
-            <div><strong>Revisão antes do envio</strong></div>
-            <div id="review_summary">Selecione método, sub-opção e informe o valor válido.</div>
+            <div id="review_summary">Aguardando preenchimento...</div>
         </div>
+        
         <button class="main-btn" id="send_btn" onclick="submitOrder()" disabled>CONFIRMAR DEPÓSITO</button>
-        <p id="loader" class="loader-text hidden">🚀 Processando envio duplo (upload + e-mail + planilha)...</p>
+        <p id="loader" class="loader-text hidden">🚀 Processando envio...</p>
     </div>
 
     <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
             <h3>📊 Minhas Ordens</h3>
-            <div style="display:flex; gap:10px;">
-                <button onclick="refreshStatus()" style="background:none; border:none; color:var(--primary); font-size:11px; cursor:pointer; font-weight:600">ATUALIZAR STATUS</button>
-                <button onclick="clearStatus()" style="background:none; border:none; color:var(--primary); font-size:11px; cursor:pointer; font-weight:600">LIMPAR STATUS</button>
-            </div>
+            <button onclick="refreshStatus()" style="background:none; border:none; color:var(--primary); font-size:11px; cursor:pointer; font-weight:600">ATUALIZAR</button>
         </div>
         <div id="orders_list">
             <p style="font-size:11px; color:var(--muted); text-align:center">Nenhuma atividade detectada.</p>
@@ -159,496 +161,367 @@
 </div>
 
 <script>
-    // --- CONFIGURAÇÃO ---
+    // --- INICIALIZAÇÃO ---
     emailjs.init("7Kf1togYs_MepnGuW");
 
     const CONFIG = {
         scriptURL: "https://script.google.com/macros/s/AKfycbwLd5_ju--UGjgvS1Je4hRDL2MJhC3fB-uMjk7oBzhKdUSTG822rCx10MDLtBYl_1o33Q/exec",
-        imgbbKey: "0df1b15bfc20421c269deb216af4713b"
+        CLOUD_NAME: "dgj5l53mw",
+        UPLOAD_PRESET: "kvn6gum3",
+        API_KEY: "926288465169768"
     };
 
+    // TODOS OS MÉTODOS REINTEGRADOS
     const dataMap = {
-        usdt: {
-            name: "USDT",
-            type: "net",
-            options: {
-                "TRC-20": "TMHvF7CoQYzLkmUd9dytY3XQgJeEQNZPy4",
-                "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622",
-                "ERC-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622"
-            }
-        },
-        trx: {
-            name: "TRX",
-            type: "net",
-            options: {
-                "TRC-20": "TMHvF7CoQYzLkmUd9dytY3XQgJeEQNZPy4",
-                "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622"
-            }
-        },
-        btc: {
-            name: "Bitcoin",
-            type: "net",
-            options: {
-                "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622",
-                "BTC": "1GUAUB9S5dwHGezh7ZJ2wLcgsXhvkaxbWW"
-            }
-        },
-        eth: {
-            name: "Ethereum",
-            type: "net",
-            options: {
-                "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622",
-                "ERC-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622"
-            }
-        },
-        binance: {
-            name: "Binance Pay",
-            type: "direct",
-            info: ["Username", "3sertrader"]
-        },
-        bank: {
-            name: "Transferência Bancária (Angola)",
-            type: "net",
-            options: {
-                BAI: "004000002238840310116",
-                BFA: "000600008100945530148",
-                ATLANTICO: "005500002286727210182"
-            }
-        },
-        express: {
-            name: "Multicaixa Express",
-            type: "direct",
-            info: ["Número", "942515887", "Referência", "{{id}}"]
-        },
-        unitel: {
-            name: "Unitel Money",
-            type: "direct",
-            info: ["Número", "942515887", "Referência", "{{id}}", "IBAN", "04170000009425158874"]
-        },
-        afrimoney: {
-            name: "Afrimoney",
-            type: "direct",
-            info: ["Número", "956803336"]
-        },
-        airtm: {
-            name: "Airtm",
-            type: "direct",
-            info: ["E-mail", "francisconongavaxavier@gmail.com"]
-        },
-        volet: {
-            name: "Volet",
-            type: "direct",
-            info: ["E-mail", "xavierfranciscoxavier432@gmail.com"]
+        usdt: { name: "USDT", type: "net", currency: "USDT", decimals: 2, options: { "TRC-20": "TMHvF7CoQYzLkmUd9dytY3XQgJeEQNZPy4", "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622", "ERC-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622" } },
+        trx: { name: "TRX", type: "net", currency: "TRX", decimals: 6, options: { "TRC-20": "TMHvF7CoQYzLkmUd9dytY3XQgJeEQNZPy4", "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622" } },
+        btc: { name: "Bitcoin", type: "net", currency: "BTC", decimals: 8, options: { "BTC": "1GUAUB9S5dwHGezh7ZJ2wLcgsXhvkaxbWW", "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622" } },
+        eth: { name: "Ethereum", type: "net", currency: "ETH", decimals: 6, options: { "ERC-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622", "BEP-20": "0x842d8535b93ca33868dad2dfefacb949b46d5622" } },
+        binance: { name: "Binance Pay", type: "direct", currency: "USD", decimals: 2, info: ["Username", "3sertrader"] },
+        bank: { name: "Transferência Bancária", type: "net", currency: "AKZ", decimals: 2, options: { BAI: "004000002238840310116", BFA: "000600008100945530148", ATLANTICO: "005500002286727210182" } },
+        express: { name: "Multicaixa Express", type: "direct", currency: "AKZ", decimals: 2, info: ["Número", "942515887"] },
+        unitel: { name: "Unitel Money", type: "direct", currency: "AKZ", decimals: 2, info: ["Número", "942515887", "IBAN", "04170000009425158874"] },
+        afrimoney: { name: "Afrimoney", type: "direct", currency: "AKZ", decimals: 2, info: ["Número", "956803336"] },
+        airtm: { name: "Airtm", type: "direct", currency: "USD", decimals: 2, info: ["E-mail", "francisconongavaxavier@gmail.com"] },
+        volet: { name: "Volet", type: "direct", currency: "USD", decimals: 2, info: ["E-mail", "xavierfranciscoxavier432@gmail.com"] }
+    };
+
+    const state = { method: "", sub: "", amount: 0, orderId: "", paymentData: "" };
+
+    function getCurrencyFormat(method) {
+        const m = dataMap[method];
+        if (!m) return { symbol: "USD", decimals: 2 };
+        
+        const currencySymbols = {
+            "USDT": "USDT",
+            "TRX": "TRX",
+            "BTC": "₿",
+            "ETH": "Ξ",
+            "USD": "$",
+            "AKZ": "Kz"
+        };
+        
+        return {
+            symbol: currencySymbols[m.currency] || m.currency,
+            decimals: m.decimals,
+            currency: m.currency
+        };
+    }
+
+    function formatCurrency(val, method = null) {
+        const fmt = method ? getCurrencyFormat(method) : { symbol: "", decimals: 3, currency: "---" };
+        const formatted = val.toFixed(fmt.decimals).replace(".", ",");
+        
+        if (fmt.symbol === "Kz") {
+            // Formato angolano: 1.234.567,89 Kz
+            const parts = formatted.split(",");
+            const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return `${intPart},${parts[1]} ${fmt.symbol}`;
+        } else if (fmt.symbol === "$") {
+            // USD: $1,234.56
+            return `${fmt.symbol} ${val.toFixed(fmt.decimals)}`;
+        } else {
+            // Crypto: BTC 0.00000001 ou USDT 100.00
+            return `${formatted} ${fmt.symbol}`;
         }
-    };
-
-    const STORAGE_KEYS = {
-        lastChoice: "payment_last_choice",
-        userEmail: "payment_user_email",
-        orderHistory: "payment_order_history"
-    };
-
-    const state = {
-        method: "",
-        sub: "",
-        amount: 0,
-        orderId: "",
-        paymentData: "",
-        lastSend: 0
-    };
-
-    function formatCurrency(value) {
-        return value.toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    function normalizeIban(value) {
-        return value
-            .toUpperCase()
-            .replace(/[^A-Z0-9]/g, "")
-            .replace(/(.{4})/g, "$1 ")
-            .trim();
+    function updateCurrencyDisplay() {
+        const fmt = state.method ? getCurrencyFormat(state.method) : { symbol: "---", decimals: 3, currency: "---" };
+        const currencyText = state.method ? `Moeda: ${fmt.currency}` : "Selecione um método para ver a moeda";
+        document.getElementById("currency_info").innerText = currencyText;
     }
 
-    function createOrderId() {
-        return "ORD" + Date.now().toString().slice(-8) + Math.floor(Math.random() * 900 + 100);
-    }
-
+    // LÓGICA DE MILÉSIMOS (ACEITA PONTO OU VÍRGULA)
     function updateAmountState() {
-        const raw = document.getElementById("amt_input").value.replace(",", ".").replace(/[^0-9.]/g, "");
-        const value = parseFloat(raw);
+        let input = document.getElementById("amt_input").value;
+        let clean = input.replace(",", ".").replace(/[^0-9.]/g, "");
+        let val = parseFloat(clean);
 
-        if (value > 0) {
-            if (!state.orderId || state.amount !== value) {
-                state.orderId = createOrderId();
+        if (!isNaN(val) && val > 0) {
+            if (!state.orderId || Math.floor(state.amount) !== Math.floor(val)) {
+                state.orderId = "ORD" + Date.now().toString().slice(-6);
+                // Se não tem decimal no que o user escreveu, gera milésimos
+                if (!clean.includes(".")) {
+                    val = val + ((Math.floor(Math.random() * 900) + 100) / 1000);
+                } else {
+                    val = parseFloat(val.toFixed(3));
+                }
             }
-            state.amount = value;
-            document.getElementById("final_amt").innerText = `R$ ${formatCurrency(value)} • ID ${state.orderId}`;
+            state.amount = val;
+            document.getElementById("final_amt").innerText = `${formatCurrency(val, state.method)} • ID ${state.orderId}`;
+            updateCurrencyDisplay();
         } else {
             state.amount = 0;
-            document.getElementById("final_amt").innerText = "R$ 0,00";
+            document.getElementById("final_amt").innerText = "0,000";
         }
-
-        updateStatus();
-        validateSubmit();
+        validate();
     }
 
     function init() {
-        const mainMethodsEl = document.getElementById("main_methods");
-        mainMethodsEl.innerHTML = "";
-
+        const grid = document.getElementById("main_methods");
         Object.entries(dataMap).forEach(([key, item]) => {
-            const button = document.createElement("button");
-            button.className = "btn-opt";
-            button.innerText = item.name;
-            button.onclick = () => selectMain(key, button);
-            mainMethodsEl.appendChild(button);
+            const btn = document.createElement("button");
+            btn.className = "btn-opt";
+            btn.innerText = item.name;
+            btn.onclick = () => selectMain(key, btn);
+            grid.appendChild(btn);
         });
-
         document.getElementById("amt_input").addEventListener("input", updateAmountState);
-        document.getElementById("u_name").addEventListener("input", () => { updateReview(); validateSubmit(); });
-        document.getElementById("u_email").addEventListener("input", () => { updateReview(); validateSubmit(); });
-        document.getElementById("u_file").addEventListener("change", validateSubmit);
-
-        loadUserCache();
+        document.getElementById("u_name").addEventListener("input", validate);
+        document.getElementById("u_email").addEventListener("input", validate);
+        document.getElementById("u_file").addEventListener("change", validate);
         refreshStatus();
     }
 
-    function loadUserCache() {
-        const lastChoice = localStorage.getItem(STORAGE_KEYS.lastChoice);
-        if (!lastChoice) return;
-
-        try {
-            const cached = JSON.parse(lastChoice);
-            if (cached?.method && dataMap[cached.method]) {
-                const button = Array.from(document.querySelectorAll("#main_methods .btn-opt")).find(el => el.innerText === dataMap[cached.method].name);
-                if (button) {
-                    selectMain(cached.method, button);
-                    if (cached?.sub) {
-                        const subButton = Array.from(document.querySelectorAll("#sub_grid .btn-opt")).find(el => el.innerText === cached.sub);
-                        if (subButton) subButton.click();
-                    }
-                }
-            }
-        } catch (error) {
-            console.warn("Falha ao ler cache de seleção", error);
-        }
-    }
-
-    function saveUserCache() {
-        localStorage.setItem(STORAGE_KEYS.lastChoice, JSON.stringify({ method: state.method, sub: state.sub }));
-    }
-
-    function resetStep() {
-        document.getElementById("sub_section").classList.add("hidden");
-        document.getElementById("sub_grid").innerHTML = "";
-        document.getElementById("data_section").classList.add("hidden");
-        document.getElementById("review_section").classList.add("hidden");
-        document.getElementById("data_val").innerText = "";
-        state.sub = "";
-        state.paymentData = "";
-        updateStatus(true);
-        saveUserCache();
-    }
-
-    function selectMain(key, button) {
+    function selectMain(key, btn) {
         state.method = key;
         state.sub = "";
-        state.paymentData = "";
-
-        document.querySelectorAll("#main_methods .btn-opt").forEach(el => el.classList.remove("active"));
-        button.classList.add("active");
-
+        document.querySelectorAll("#main_methods .btn-opt").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        
         const item = dataMap[key];
-        document.getElementById("workflow_status").classList.remove("hidden");
-        document.getElementById("status_method").innerText = `Método: ${item.name}`;
-        document.getElementById("status_sub").innerText = item.type === "net" ? "Opção: —" : "Opção: não aplicável";
-
-        resetStep();
-
         if (item.type === "net") {
             renderSub(item.options);
+            document.getElementById("data_section").classList.add("hidden");
         } else {
-            showData(buildPaymentData(item));
+            document.getElementById("sub_section").classList.add("hidden");
+            showData(item.name + "\n" + item.info.join(": "));
         }
-
-        updateStatus();
-        validateSubmit();
-        saveUserCache();
+        updateCurrencyDisplay();
+        updateAmountState();
+        validate();
     }
 
-    function renderSub(options) {
+    function renderSub(opts) {
         const grid = document.getElementById("sub_grid");
         grid.innerHTML = "";
         document.getElementById("sub_section").classList.remove("hidden");
-
-        Object.keys(options).forEach(option => {
-            const button = document.createElement("button");
-            button.className = "btn-opt";
-            button.innerText = option;
-            button.onclick = () => {
-                document.querySelectorAll("#sub_grid .btn-opt").forEach(el => el.classList.remove("active"));
-                button.classList.add("active");
-                state.sub = option;
-                showData(buildPaymentData(dataMap[state.method], option));
+        Object.keys(opts).forEach(o => {
+            const btn = document.createElement("button");
+            btn.className = "btn-opt";
+            btn.innerText = o;
+            btn.onclick = () => {
+                document.querySelectorAll("#sub_grid .btn-opt").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                state.sub = o;
+                showData(`${dataMap[state.method].name} (${o})\n${opts[o]}`);
             };
-            grid.appendChild(button);
+            grid.appendChild(btn);
         });
     }
 
-    function buildPaymentData(item, selectedOption = "") {
-        if (item.type === "net") {
-            const rawValue = item.options[selectedOption] || "";
-            const value = item.name.includes("Transferência") ? normalizeIban(rawValue) : rawValue;
-            return `${item.name} • ${selectedOption}\n${item.name.includes("Transferência") ? `IBAN: ${value}` : value}`;
-        }
-
-        const lines = [];
-        item.info.forEach((itemValue, index) => {
-            if (itemValue === "{{id}}") {
-                lines.push(state.orderId || createOrderId());
-                if (!state.orderId) state.orderId = lines[lines.length - 1];
-                return;
-            }
-            if (itemValue.includes("{{id}}")) {
-                lines.push(itemValue.replace("{{id}}", state.orderId || createOrderId()));
-                if (!state.orderId) state.orderId = lines[lines.length - 1];
-                return;
-            }
-            lines.push(itemValue);
-        });
-        return `${item.name}\n${lines.join("\n")}`;
-    }
-
-    function showData(value) {
-        if (!state.orderId) state.orderId = createOrderId();
-        state.paymentData = value;
-        document.getElementById("data_val").innerText = value;
+    function showData(txt) {
+        state.paymentData = txt;
+        document.getElementById("data_val").innerText = txt;
         document.getElementById("data_section").classList.remove("hidden");
-        document.getElementById("review_section").classList.remove("hidden");
-        updateReview();
-        updateStatus();
-        validateSubmit();
-        saveUserCache();
+        validate();
     }
 
-    function updateStatus(clear = false) {
-        const statusEl = document.getElementById("workflow_status");
-        if (clear) {
-            statusEl.classList.remove("hidden");
-            document.getElementById("status_amount").innerText = `Valor final: ${state.amount > 0 ? `R$ ${formatCurrency(state.amount)} • ID ${state.orderId}` : "R$ 0,00"}`;
-            return;
-        }
-        document.getElementById("status_amount").innerText = `Valor final: ${state.amount > 0 ? `R$ ${formatCurrency(state.amount)} • ID ${state.orderId}` : "R$ 0,00"}`;
-    }
-
-    function updateReview() {
-        const name = document.getElementById("u_name").value.trim() || "—";
-        const email = document.getElementById("u_email").value.trim() || "—";
-        const amount = state.amount > 0 ? `R$ ${formatCurrency(state.amount)}` : "—";
-        const method = state.method ? dataMap[state.method].name : "—";
-        const sub = state.sub || (dataMap[state.method]?.type === "net" ? "—" : "Não aplicável");
-
-        document.getElementById("review_summary").innerText = `Nome: ${name} | Email: ${email} | Valor: ${amount} | Método: ${method} | Opção: ${sub}`;
-    }
-
-    function validateSubmit() {
+    function validate() {
         const name = document.getElementById("u_name").value.trim();
         const email = document.getElementById("u_email").value.trim();
         const file = document.getElementById("u_file").files[0];
-        const hasMethod = !!state.method;
-        const hasSub = dataMap[state.method]?.type === "net" ? !!state.sub : true;
-        const isValidAmount = state.amount > 0;
-        const orderReady = name && email && file && hasMethod && hasSub && isValidAmount && !!state.paymentData;
-
-        const now = Date.now();
-        const waitRemaining = state.lastSend ? Math.max(0, 10000 - (now - state.lastSend)) : 0;
-
-        const sendBtn = document.getElementById("send_btn");
-        if (waitRemaining > 0) {
-            sendBtn.disabled = true;
-            sendBtn.innerText = `Aguarde ${Math.ceil(waitRemaining / 1000)}s`;
-        } else {
-            sendBtn.disabled = !orderReady;
-            sendBtn.innerText = "CONFIRMAR DEPÓSITO";
-        }
-
-        if (orderReady) {
+        const ok = name && email && file && state.amount > 0 && state.paymentData;
+        
+        document.getElementById("send_btn").disabled = !ok;
+        if(ok) {
             document.getElementById("review_section").classList.remove("hidden");
+            document.getElementById("review_summary").innerText = `Nome: ${name}\nValor: ${formatCurrency(state.amount, state.method)}\nID: ${state.orderId}`;
         }
-        return orderReady && waitRemaining === 0;
     }
 
     function copyPaymentData() {
-        if (!state.paymentData) return;
-        const lines = state.paymentData.split('\n');
-        const principal = lines[lines.length - 1];
-        navigator.clipboard.writeText(principal).then(() => {
-            const feedback = document.getElementById("copy_feedback");
-            feedback.classList.remove("hidden");
-            feedback.innerText = "Copiado com sucesso";
-            setTimeout(() => feedback.classList.add("hidden"), 1500);
+        const lines = document.getElementById("data_val").innerText.split('\n');
+        navigator.clipboard.writeText(lines.pop()).then(() => {
+            const f = document.getElementById("copy_feedback");
+            f.classList.remove("hidden");
+            setTimeout(() => f.classList.add("hidden"), 1500);
         });
     }
 
-    function getLocalOrders() {
-        try {
-            return JSON.parse(localStorage.getItem(STORAGE_KEYS.orderHistory) || "[]");
-        } catch (error) {
-            return [];
-        }
+    function getOrderHistory() {
+        return JSON.parse(localStorage.getItem("payment_order_history") || "[]");
     }
 
-    function saveLocalOrder(order) {
-        const orders = getLocalOrders();
-        orders.unshift(order);
-        localStorage.setItem(STORAGE_KEYS.orderHistory, JSON.stringify(orders.slice(0, 30)));
+    function saveOrderHistory(history) {
+        localStorage.setItem("payment_order_history", JSON.stringify(history));
     }
 
-    async function submitOrder() {
-        if (!validateSubmit()) {
-            return alert("Preencha todos os campos obrigatórios e selecione o método correto.");
+    function renderOrderList(items, note = "Nenhuma atividade detectada.") {
+        const container = document.getElementById("orders_list");
+        if (!items.length) {
+            container.innerHTML = `<p style="font-size:11px; color:var(--muted); text-align:center">${note}</p>`;
+            return;
         }
 
-        const name = document.getElementById("u_name").value.trim();
-        const email = document.getElementById("u_email").value.trim();
-        const file = document.getElementById("u_file").files[0];
-        const method = dataMap[state.method].name;
-        const subOption = state.sub || (dataMap[state.method]?.type === "net" ? "—" : "Sem subopção");
+        container.innerHTML = items.map(o => `
+            <div class="order-item">
+                <div style="display:flex; justify-content:space-between; gap:10px">
+                    <div>
+                        <b>${o.metodo}</b>
+                        <div style="font-size:11px; margin-top:5px">${o.valor} | ${new Date(o.data).toLocaleDateString()}</div>
+                    </div>
+                    <div style="text-align:right">
+                        <span class="status-tag status-${o.status.toLowerCase()}">${o.status}</span>
+                        <button class="delete-btn" onclick="deleteOrder('${o.id}')">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        `).join("");
+    }
 
-        if (Date.now() - state.lastSend < 10000) {
-            return alert("Aguarde 10 segundos entre os envios para evitar spam.");
-        }
+    function deleteOrder(id) {
+        const history = getOrderHistory().filter(item => item.id !== id);
+        saveOrderHistory(history);
+        renderOrderList(history, history.length ? "" : "Nenhuma atividade detectada.");
+    }
 
-        state.lastSend = Date.now();
-        validateSubmit();
-        document.getElementById("send_btn").disabled = true;
-        document.getElementById("loader").classList.remove("hidden");
-
+    async function sendBackendPayload(payload) {
         try {
-            const fd = new FormData();
-            fd.append("image", file);
-            const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${CONFIG.imgbbKey}`, { method: "POST", body: fd });
-            const imgJson = await resImg.json();
-            const finalImgLink = imgJson.data?.url || "";
-
-            const payload = {
-                id: state.orderId,
-                nome: name,
-                email: email,
-                valor: `R$ ${formatCurrency(state.amount)} • ID ${state.orderId}`,
-                metodo: method,
-                subOpcao: subOption,
-                destino: state.paymentData,
-                comprovante: finalImgLink,
-                timestamp: new Date().toISOString()
-            };
-
-            const sheetTask = fetch(CONFIG.scriptURL, {
+            const res = await fetch(CONFIG.scriptURL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error(`Status ${res.status}`);
+            return await res.json();
+        } catch (err) {
+            console.warn("POST CORS falhou, tentando no-cors", err);
+            await fetch(CONFIG.scriptURL, {
                 method: "POST",
                 mode: "no-cors",
                 body: JSON.stringify(payload)
             });
-
-            const emailTask = emailjs.send("service_c6pxohd", "template_cc591m9", {
-                name: name,
-                email: email,
-                amount: payload.valor,
-                method: method,
-                subOption: subOption,
-                destination: state.paymentData,
-                img_url: finalImgLink,
-                id: state.orderId,
-                date: new Date().toLocaleString()
-            });
-
-            await Promise.all([sheetTask, emailTask]);
-
-            localStorage.setItem(STORAGE_KEYS.userEmail, email);
-            saveLocalOrder({
-                id: state.orderId,
-                metodo: method,
-                valor: payload.valor,
-                data: new Date().toISOString(),
-                status: "Pendente",
-                email: email
-            });
-
-            alert("✅ Depósito confirmado. Seu pedido foi enviado com sucesso.");
-            refreshStatus();
-            document.getElementById("loader").classList.add("hidden");
-            document.getElementById("send_btn").disabled = true;
-        } catch (error) {
-            console.error(error);
-            alert("Erro ao processar o envio. Verifique sua conexão e tente novamente.");
-            document.getElementById("loader").classList.add("hidden");
-            validateSubmit();
         }
-    }
-
-    function dedupeOrders(orders) {
-        const map = new Map();
-        orders.forEach(order => {
-            const key = order.id || `${order.metodo}|${order.valor}|${order.data}`;
-            if (!map.has(key)) {
-                map.set(key, order);
-            }
-        });
-        return Array.from(map.values());
-    }
-
-    function clearStatus() {
-        localStorage.removeItem(STORAGE_KEYS.orderHistory);
-        document.getElementById("orders_list").innerHTML = "<p style='font-size:11px; color:var(--muted); text-align:center'>Status limpo com sucesso.</p>";
     }
 
     async function refreshStatus() {
-        const email = localStorage.getItem(STORAGE_KEYS.userEmail);
-        const list = document.getElementById("orders_list");
-        if (!email) {
-            list.innerHTML = "<p style='font-size:11px; color:var(--muted); text-align:center'>Nenhum e-mail cadastrado ainda.</p>";
-            return;
+        const email = localStorage.getItem("payment_user_email");
+        const localHistory = getOrderHistory();
+        const btn = document.querySelector("[onclick='refreshStatus()']");
+        
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "🔄 ATUALIZANDO...";
         }
-
-        list.innerHTML = "<p style='text-align:center; font-size:11px; color:var(--primary)'>Sincronizando...</p>";
-
-        let orders = getLocalOrders().filter(order => order.email === email);
 
         try {
-            const res = await fetch(`${CONFIG.scriptURL}?email=${encodeURIComponent(email)}`);
-            const remote = await res.json();
-            if (Array.isArray(remote)) {
-                const normalized = remote.map(item => ({
-                    id: item.id || item.ID || item.orderId || "—",
-                    metodo: item.metodo || item.method || "Desconhecido",
-                    valor: item.valor || item.amount || "—",
-                    data: item.data || item.timestamp || new Date().toISOString(),
-                    status: item.status || "Pendente"
-                }));
-                orders = normalized.concat(orders);
+            if (!email) {
+                console.log("Sem email salvo, mostrando histórico local");
+                renderOrderList(localHistory, localHistory.length ? "Ordens locais (offline)" : "Nenhuma atividade detectada.");
+                return;
             }
-        } catch (error) {
-            console.warn("Falha ao buscar status remoto", error);
+
+            console.log("📡 Buscando status remoto para:", email);
+            const res = await fetch(`${CONFIG.scriptURL}?email=${encodeURIComponent(email)}`);
+            
+            if (!res.ok) throw new Error(`Status ${res.status}`);
+            
+            const remote = await res.json();
+            console.log("✅ Dados remotos recebidos:", remote);
+            
+            const merged = localHistory.map(item => {
+                const remoteMatch = remote.find(r => r.id === item.id);
+                return { ...item, status: remoteMatch?.status || item.status || "Pendente" };
+            });
+            
+            saveOrderHistory(merged);
+            renderOrderList(merged);
+            console.log("✅ Status atualizado com sucesso!");
+        } catch (e) {
+            console.warn("❌ Erro ao atualizar status:", e);
+            renderOrderList(localHistory, localHistory.length ? "⚠️ Atualização indisponível (offline)" : "Nenhuma atividade detectada.");
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "ATUALIZAR";
+            }
         }
+    }
 
-        orders = dedupeOrders(orders);
+    async function submitOrder() {
+        document.getElementById("send_btn").disabled = true;
+        document.getElementById("loader").classList.remove("hidden");
 
-        if (orders.length === 0) {
-            list.innerHTML = "<p style='text-align:center; font-size:11px;'>Nenhuma ordem encontrada.</p>";
-            return;
+        try {
+            const file = document.getElementById("u_file").files[0];
+            const fd = new FormData();
+            fd.append("file", file);
+            fd.append("upload_preset", CONFIG.UPLOAD_PRESET);
+            fd.append("api_key", CONFIG.API_KEY);
+            fd.append("folder", "comprovante");
+
+            console.log("📤 Iniciando upload para Cloudinary...");
+            const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${CONFIG.CLOUD_NAME}/image/upload`, {
+                method: "POST",
+                body: fd
+            });
+            const cloudData = await cloudRes.json();
+            
+            if (!cloudData.secure_url) {
+                console.error("❌ Erro Cloudinary:", cloudData);
+                throw new Error("Falha no upload da imagem: " + (cloudData.error?.message || "URL não retornada"));
+            }
+            
+            const url = cloudData.secure_url;
+            console.log("✅ Upload concluído:", url);
+
+            const payload = {
+                id: state.orderId,
+                nome: document.getElementById("u_name").value,
+                email: document.getElementById("u_email").value,
+                valor: formatCurrency(state.amount, state.method),
+                metodo: dataMap[state.method].name + (state.sub ? ` (${state.sub})` : ""),
+                comprovante: url
+            };
+
+            console.log("📧 Enviando email via EmailJS...");
+            await emailjs.send("service_c6pxohd", "template_cc591m9", {
+                name: payload.nome,
+                email: payload.email,
+                amount: payload.valor,
+                method: payload.metodo,
+                img_url: url,
+                time: new Date().toLocaleString('pt-BR'),
+                message: "Solicitação de depósito via Exchange Pro."
+            });
+            console.log("✅ Email enviado com sucesso!");
+
+            console.log("💾 Salvando dados no backend...");
+            await sendBackendPayload(payload);
+            console.log("✅ Backend atualizado!");
+
+            const history = getOrderHistory();
+            history.unshift({ ...payload, data: new Date().toISOString(), status: "Pendente" });
+            saveOrderHistory(history);
+            localStorage.setItem("payment_user_email", payload.email);
+
+            alert("✅ Recebido! O seu depósito está em processamento.");
+            location.reload();
+        } catch (e) {
+            console.error("❌ Erro completo:", e);
+            alert("❌ Erro no envio:\n" + e.message + "\n\nVerifique o console (F12) para mais detalhes.");
+            document.getElementById("loader").classList.add("hidden");
+            document.getElementById("send_btn").disabled = false;
         }
+    }
 
-        list.innerHTML = orders.slice(0, 10).map(o => `
-            <div class="order-item">
-                <div style="display:flex; justify-content:space-between; align-items:center">
-                    <span style="font-weight:600; font-size:13px">${o.metodo}</span>
-                    <span class="status-tag status-${o.status.toLowerCase().replace(/ú/g, 'u').replace(/[^a-z0-9]/gi,'')}">${o.status}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:6px">
-                    <span style="color:var(--text); font-weight:500">${o.valor}</span>
-                    <span>${new Date(o.data).toLocaleDateString()}</span>
-                </div>
-            </div>
-        `).join("");
+    function init() {
+        const grid = document.getElementById("main_methods");
+        Object.entries(dataMap).forEach(([key, item]) => {
+            const btn = document.createElement("button");
+            btn.className = "btn-opt";
+            btn.innerText = item.name;
+            btn.onclick = () => selectMain(key, btn);
+            grid.appendChild(btn);
+        });
+        document.getElementById("amt_input").addEventListener("input", updateAmountState);
+        document.getElementById("u_name").addEventListener("input", validate);
+        document.getElementById("u_email").addEventListener("input", validate);
+        document.getElementById("u_file").addEventListener("change", validate);
+        renderOrderList(getOrderHistory());
+        refreshStatus();
     }
 
     init();
