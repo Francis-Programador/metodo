@@ -188,17 +188,7 @@
         <p class="subtitle">Sistema de Depósito Automatizado</p>
     </header>
 
-    <div class="card">
-        <h3>1. Informe o Valor</h3>
-        <input id="amt_input" type="text" placeholder="Ex: 500,00 ou 500.00">
-        <div class="preview-box">
-            <small style="display:block; font-size:10px; color:var(--muted); margin-bottom:10px">VALOR EXATO A ENVIAR (ID DE DEPÓSITO)</small>
-            <div style="display:flex; flex-direction:column; align-items:center; gap:8px">
-                <span id="final_amt" style="font-size:36px; font-weight:700; color:var(--primary); font-family:monospace">0,000</span>
-                <div id="currency_info" style="font-size:11px; color:var(--muted)">Selecione um método para ver a moeda</div>
-            </div>
-        </div>
-    </div>
+   
 
     <div class="card">
         <h3>2. Selecione o Método</h3>
@@ -213,6 +203,17 @@
             <div class="data-display" id="data_val"></div>
             <button class="copy-btn" onclick="copyPaymentData()">Copiar Dados de Pagamento</button>
             <div id="copy_feedback" class="loader-text hidden" style="margin-top:6px">Copiado com sucesso!</div>
+        </div>
+    </div>
+     <div class="card">
+        <h3>1. Informe o Valor</h3>
+        <input id="amt_input" type="text" placeholder="Ex: 500,00 ou 500.00">
+        <div class="preview-box">
+            <small style="display:block; font-size:10px; color:var(--muted); margin-bottom:10px">VALOR EXATO A ENVIAR (ID DE DEPÓSITO)</small>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px">
+                <span id="final_amt" style="font-size:36px; font-weight:700; color:var(--primary); font-family:monospace">0,000</span>
+                <div id="currency_info" style="font-size:11px; color:var(--muted)">Selecione um método para ver a moeda</div>
+            </div>
         </div>
     </div>
 
